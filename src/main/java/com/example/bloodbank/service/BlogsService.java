@@ -82,7 +82,7 @@ public class BlogsService {
     }
 
     public void uploadImage(BlogEntity blogEntity,MultipartFile image) throws IOException {
-        String storageDir = "uploads/blogs";
+        String storageDir = "src/main/resources/uploads/blogs";
         Path storagePath = Path.of(storageDir).toAbsolutePath().normalize();
         if(Files.notExists(storagePath)){
             Files.createDirectories(storagePath);
@@ -106,7 +106,7 @@ public class BlogsService {
     }
 
     public void delete(BlogEntity blogEntity) throws IOException {
-        Path storagePath = Path.of("uploads/blogs").toAbsolutePath().normalize();
+        Path storagePath = Path.of("src/main/resources/uploads/blogs").toAbsolutePath().normalize();
         Files.deleteIfExists(storagePath.resolve(blogEntity.getImage()));
         this.blogRepository.delete(blogEntity);
     }
