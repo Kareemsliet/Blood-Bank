@@ -7,6 +7,7 @@ import com.example.bloodbank.entity.DonationEntity;
 import com.example.bloodbank.exception.NotFoundIDException;
 import com.example.bloodbank.repository.DonationRepository;
 import jakarta.validation.Valid;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -48,6 +49,25 @@ public class DonationsService {
                 .toList();
         return new PaginationResponse(
                 itemsPage,
+                pageNumber,
+                pagination.getTotalPages(),
+                pagination.hasNext(),
+                pagination.hasPrevious(),
+                pagination.getTotalElements()
+        );
+    }
+
+    @Transactional
+    public PaginationResponse getPublicPagination(int pageNumber) {
+        pageNumber = Math.max(pageNumber, 1);
+        Page<DonationEntity> pagination = donationRepository.findAll(
+                PageRequest.of(pageNumber - 1, 12, Sort.by("createdAt").descending())
+        );
+        List<DonationDto> items = pagination.getContent().stream()
+                .map(DonationDto::toDto)
+                .toList();
+        return new PaginationResponse(
+                items,
                 pageNumber,
                 pagination.getTotalPages(),
                 pagination.hasNext(),

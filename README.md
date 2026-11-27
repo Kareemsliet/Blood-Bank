@@ -16,6 +16,7 @@ operations.
 - [Database](#database)
 - [Authentication and authorization](#authentication-and-authorization)
 - [API reference](#api-reference)
+- [Latest route updates](#latest-route-updates)
 - [Responses and errors](#responses-and-errors)
 - [Tests and packaging](#tests-and-packaging)
 - [Operational notes](#operational-notes)
@@ -193,6 +194,16 @@ authentication.
 All paths below are relative to `http://localhost:8080`. JSON request bodies
 should use `Content-Type: application/json`, except blog image uploads.
 
+### Latest route updates
+
+The public donation routes were recently added. They do not require
+authentication and return donation records, with the list ordered newest first.
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/donations?page=1` | List donations (12 records per page) |
+| `GET` | `/api/donations/{id}` | Get a donation |
+
 ### Client authentication
 
 | Method | Path | Purpose |
@@ -200,6 +211,20 @@ should use `Content-Type: application/json`, except blog image uploads.
 | `POST` | `/api/auth/register` | Register a client and return an access token |
 | `POST` | `/api/auth/login` | Authenticate a client |
 | `POST` | `/api/auth/check` | Check whether a client token is valid |
+
+### Public app content
+
+These read-only routes do not require authentication. Paths use the `/api`
+prefix. Collection routes accept `page` (default `1`) and `q` (default empty)
+query parameters; lists contain 12 records per page.
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/blogs?page=1&q=` | List/search blog content |
+| `GET` | `/api/blogs/{id}` | Get a blog |
+| `GET` | `/api/blog-categories?page=1&q=` | List/search blog categories |
+| `GET` | `/api/states?page=1&q=` | List/search states |
+| `GET` | `/api/cities?page=1&q=` | List/search cities |
 
 ### Client account (`/api/me`)
 

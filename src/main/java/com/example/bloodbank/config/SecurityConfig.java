@@ -36,12 +36,18 @@ public class SecurityConfig {
                 AbstractHttpConfigurer::disable
         ).authorizeHttpRequests(
                 authorizeRequests -> authorizeRequests.requestMatchers(
-                        "/api/dashboard/auth/login",
-                        "/api/dashboard/auth/check",
-                        "/api/auth/login",
-                        "/api/auth/register",
-                        "/api/auth/check",
-                        "/error")
+                                "/api/dashboard/auth/login",
+                                "/api/dashboard/auth/check",
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/check",
+                                "/api/donations/**",
+                                "/api/blogs/**",
+                                "/api/blog-categories",
+                                "/api/states",
+                                "/api/cities",
+                                "/error"
+                        )
                         .permitAll()
                         .anyRequest()
                         .authenticated()
