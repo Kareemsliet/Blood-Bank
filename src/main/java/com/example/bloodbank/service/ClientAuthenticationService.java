@@ -14,6 +14,7 @@ import com.example.bloodbank.util.JwtToken;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Service
 @Validated
 @AllArgsConstructor
+@Slf4j
 public class ClientAuthenticationService {
     
     private final ClientRepository clientRepository;
@@ -37,10 +39,12 @@ public class ClientAuthenticationService {
     private ClientEntity attempt(String email, String password) throws AuthenticationException {
         Optional<ClientEntity> client = clientRepository.findByEmail(email);
         if(client.isEmpty()){
+            log.warn("Client authentication failed");
             throw new AuthenticationException("email or password not found");
         }
         String encodedPassword = client.get().getPassword();
         if(!passwordEncoder.matches(password,encodedPassword)){
+            log.warn("Client authentication failed");
             throw new AuthenticationException("email or password no found");
         }
         return client.get();
@@ -61,6 +65,7 @@ public class ClientAuthenticationService {
         ClientEntity client = applyRequest(data);
 
         PersonalAccessTokenEntity personalAccessToken = createNewPersonalAccessToken(client.getId());
+        log.info("Registered client with id {}", client.getId());
         String token = jwtToken.generateToken(
                 personalAccessToken.getId(),
                 "clients",
@@ -91,6 +96,7 @@ public class ClientAuthenticationService {
         ClientEntity client = attempt(data.getEmail(),data.getPassword());
 
         PersonalAccessTokenEntity personalAccessToken = createNewPersonalAccessToken(client.getId());
+        log.info("Client with id {} authenticated successfully", client.getId());
         String token = jwtToken.generateToken(
                 personalAccessToken.getId(),
                 "clients",
@@ -112,12 +118,14 @@ public class ClientAuthenticationService {
         client.setPassword(passwordEncoder.encode(data.getPassword()));
         client.setUpdatedAt(LocalDateTime.now());
         this.clientRepository.save(client);
+        log.info("Updated password for client with id {}", clientId);
     }
 
     @Transactional
     public void logout(String tokenId){
         personalAccessTokenRepository.deleteById(tokenId);
         SecurityContextHolder.clearContext();
+        log.info("Client logged out successfully");
     }
 
 }

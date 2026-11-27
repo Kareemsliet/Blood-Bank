@@ -38,7 +38,7 @@ public class UserEntity implements PersonalAccess {
             joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
     )
-    @BatchSize(size = 20)
+    @BatchSize(size = 14)
     private Set<RoleEntity> roles = new HashSet<>();
     public void syncRoles(List<RoleEntity> roles){
         this.roles.retainAll(roles);

@@ -17,42 +17,44 @@ import java.math.BigDecimal;
 @Setter
 public class DonationRequest {
 
-    @Positive
-    @ExistsColumn(targetEntity = ClientEntity.class)
+    @Positive(message = "Client ID must be a positive number")
+    @ExistsColumn(targetEntity = ClientEntity.class, message = "The selected client does not exist")
     private long clientId;
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @Positive
+    @Positive(message = "Age must be a positive number")
     private int age;
 
-    @NotBlank
+    @NotBlank(message = "Phone number is required")
     private String phone;
 
-    @Positive
-    @ExistsColumn(targetEntity = CityEntity.class)
+    @Positive(message = "City ID must be a positive number")
+    @ExistsColumn(targetEntity = CityEntity.class, message = "The selected city does not exist")
     private Long cityId;
 
-    @NotBlank
-    @EnumValue(targetEnum = BloodType.class,fieldName = "symbol")
+    @NotBlank(message = "Blood type is required")
+    @EnumValue(targetEnum = BloodType.class, fieldName = "symbol",
+            message = "Blood type must be a valid blood type")
     private String bloodType;
 
     private String comment;
 
-    @NotBlank
+    @NotBlank(message = "Address is required")
     private String address;
 
-    @Positive
+    @Positive(message = "Donation amount must be a positive number")
     private int amount;
 
-    @DecimalMin("-90.0")
+    @DecimalMin(value = "-90.0", message = "Latitude must be at least -90.0")
     private BigDecimal latitude;
 
-    @DecimalMin("-180.0")
+    @DecimalMin(value = "-180.0", message = "Longitude must be at least -180.0")
     private BigDecimal longitude;
 
     public BloodType getBloodType(){
         return BloodType.fromSymbol(this.bloodType);
     }
+
 }

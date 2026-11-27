@@ -23,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Validated
@@ -63,16 +64,21 @@ public class ClientAppService {
     public void newDonation(@Valid DonationRequest data) {
         DonationEntity donation = new DonationEntity();
         applyDonationRequest(donation,data);
-        donationRepository.save(donation);
+        DonationEntity savedDonation = donationRepository.save(donation);
+        log.info("Created donation with id {} for client with id {}", savedDonation.getId(), savedDonation.getClientId());
     }
 
     public void deleteDonation(DonationEntity donationEntity) {
         donationRepository.delete(donationEntity);
+        log.info("Deleted donation with id {}", donationEntity.getId());
     }
 
     public DonationEntity findDonation(long id,long clientId){
         return donationRepository.findByIdAndClientId(id,clientId).orElseThrow(
-                () -> new NotFoundIDException("Donation with id " + id + " not found")
+                () -> {
+                    log.warn("Donation with id {} was not found for client with id {}", id, clientId);
+                    return new NotFoundIDException("Donation with id " + id + " not found");
+                }
         );
     }
 
@@ -100,11 +106,18 @@ public class ClientAppService {
     @Transactional
     public void toggleBlog(long clientId,long blogId) {
         BlogEntity blog = blogRepository.findById(blogId).orElseThrow(
-                () -> new NotFoundIDException("Blog with id " + blogId + " not found")
+                () -> {
+                    log.warn("Blog with id {} was not found while updating favorites for client with id {}", blogId, clientId);
+                    return new NotFoundIDException("Blog with id " + blogId + " not found");
+                }
         );
-        ClientEntity client = clientRepository.findById(clientId).orElseThrow();
+        ClientEntity client = clientRepository.findById(clientId).orElseThrow(() -> {
+            log.warn("Client with id {} was not found while updating favorite blogs", clientId);
+            return new NoSuchElementException();
+        });
         client.toggleBlog(blog);
         clientRepository.save(client);
+        log.info("Updated favorite blog {} for client {}", blogId, clientId);
     }
 
     private void applyDonationRequest(DonationEntity donationEntity,DonationRequest data) {

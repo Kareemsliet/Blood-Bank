@@ -12,10 +12,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CityRequest {
-    @NotBlank
-    @UniqueColumn(column = "name",targetEntity = CityEntity.class)
+    @NotBlank(message = "City name is required")
+    @UniqueColumn(column = "name", targetEntity = CityEntity.class,
+            message = "A city with this name already exists")
     private String name;
-    @Positive(message = "the value not valid")
-    @ExistsColumn(targetEntity = StateEntity.class)
+    @Positive(message = "State ID must be a positive number")
+    @ExistsColumn(targetEntity = StateEntity.class, message = "The selected state does not exist")
     private long stateId;
 }

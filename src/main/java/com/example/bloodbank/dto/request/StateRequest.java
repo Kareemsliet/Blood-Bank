@@ -9,7 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StateRequest {
-    @NotBlank
-    @UniqueColumn(column = "name",targetEntity = StateEntity.class)
+    @NotBlank(message = "State name is required")
+    @UniqueColumn(column = "name", targetEntity = StateEntity.class,
+            message = "A state with this name already exists")
     private String name;
 }

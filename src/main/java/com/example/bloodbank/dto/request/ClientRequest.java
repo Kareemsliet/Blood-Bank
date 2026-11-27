@@ -20,27 +20,29 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class ClientRequest {
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotBlank
-    @Email
-    @UniqueColumn(column = "email", targetEntity = ClientEntity.class)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address")
+    @UniqueColumn(column = "email", targetEntity = ClientEntity.class,
+            message = "An account with this email already exists")
     private String email;
 
-    @Size(min = 8)
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @Positive(message = "the value not valid")
-    @ExistsColumn(targetEntity = CityEntity.class)
+    @Positive(message = "City ID must be a positive number")
+    @ExistsColumn(targetEntity = CityEntity.class, message = "The selected city does not exist")
     private long cityId;
 
-    @NotNull
-    @Past
+    @NotNull(message = "Birth date is required")
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @NotBlank
-    @EnumValue(targetEnum = BloodType.class,fieldName = "symbol")
+    @NotBlank(message = "Blood type is required")
+    @EnumValue(targetEnum = BloodType.class, fieldName = "symbol",
+            message = "Blood type must be a valid blood type")
     private String bloodType;
 
     public BloodType getBloodType(){

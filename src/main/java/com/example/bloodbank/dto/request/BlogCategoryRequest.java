@@ -9,7 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BlogCategoryRequest {
-    @NotBlank
-    @UniqueColumn(column = "name",targetEntity = BlogCategoryEntity.class)
+    @NotBlank(message = "Category name is required")
+    @UniqueColumn(column = "name", targetEntity = BlogCategoryEntity.class,
+            message = "A category with this name already exists")
     private String name;
 }

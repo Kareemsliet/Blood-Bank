@@ -33,7 +33,10 @@ public class BlogsService {
 
     public BlogEntity findById(long id){
         return blogRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Blog with id " + id + " not found")
+                () -> {
+                    log.warn("Blog with id {} was not found", id);
+                    return new NotFoundIDException("Blog with id " + id + " not found");
+                }
         );
     }
 
@@ -66,13 +69,15 @@ public class BlogsService {
         BlogEntity blogEntity = new BlogEntity();
         applyRequest(blogEntity,data);
         blogEntity.setCreatedAt(LocalDateTime.now());
-        this.blogRepository.save(blogEntity);
+        BlogEntity savedBlog = this.blogRepository.save(blogEntity);
+        log.info("Created blog with id {}", savedBlog.getId());
     }
 
     public void update(BlogEntity blogEntity, @Valid BlogRequest data){
         applyRequest(blogEntity,data);
         blogEntity.setUpdatedAt(LocalDateTime.now());
         this.blogRepository.save(blogEntity);
+        log.info("Updated blog with id {}", blogEntity.getId());
     }
 
     private void applyRequest(BlogEntity blogEntity, BlogRequest data) {
@@ -103,12 +108,14 @@ public class BlogsService {
         blogEntity.setUpdatedAt(LocalDateTime.now());
 
         this.blogRepository.save(blogEntity);
+        log.info("Uploaded image for blog with id {}", blogEntity.getId());
     }
 
     public void delete(BlogEntity blogEntity) throws IOException {
         Path storagePath = Path.of("src/main/resources/uploads/blogs").toAbsolutePath().normalize();
         Files.deleteIfExists(storagePath.resolve(blogEntity.getImage()));
         this.blogRepository.delete(blogEntity);
+        log.info("Deleted blog with id {}", blogEntity.getId());
     }
 
 }

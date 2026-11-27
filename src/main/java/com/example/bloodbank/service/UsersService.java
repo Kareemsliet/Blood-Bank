@@ -34,7 +34,10 @@ public class UsersService {
 
     public UserEntity findById(long id){
         return userRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("User with id " + id + " not found")
+                () -> {
+                    log.warn("User with id {} was not found", id);
+                    return new NotFoundIDException("User with id " + id + " not found");
+                }
         );
     }
 
@@ -69,7 +72,8 @@ public class UsersService {
         applyRequest(userEntity, data);
         userEntity.setPassword(passwordEncoder.encode(data.getPassword()));
         userEntity.setCreatedAt(LocalDateTime.now());
-        this.userRepository.save(userEntity);
+        UserEntity savedUser = this.userRepository.save(userEntity);
+        log.info("Created user with id {}", savedUser.getId());
     }
 
     @Transactional
@@ -77,6 +81,7 @@ public class UsersService {
         applyRequest(userEntity, data);
         userEntity.setUpdatedAt(LocalDateTime.now());
         this.userRepository.save(userEntity);
+        log.info("Updated user with id {}", userEntity.getId());
     }
 
     private void applyRequest(UserEntity userEntity, UserRequest data) {
@@ -89,10 +94,12 @@ public class UsersService {
         userEntity.setPassword(passwordEncoder.encode(data.getPassword()));
         userEntity.setUpdatedAt(LocalDateTime.now());
         this.userRepository.save(userEntity);
+        log.info("Updated password for user with id {}", userEntity.getId());
     }
 
     public void delete(UserEntity userEntity){
         this.userRepository.delete(userEntity);
+        log.info("Deleted user with id {}", userEntity.getId());
     }
 
 }

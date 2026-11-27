@@ -31,7 +31,10 @@ public class RolesService {
 
     public RoleEntity findById(long id){
         return roleRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Role with id " + id + " not found")
+                () -> {
+                    log.warn("Role with id {} was not found", id);
+                    return new NotFoundIDException("Role with id " + id + " not found");
+                }
         );
     }
 
@@ -65,7 +68,8 @@ public class RolesService {
         RoleEntity roleEntity = new RoleEntity();
         applyRequest(roleEntity, data);
         roleEntity.setCreatedAt(LocalDateTime.now());
-        this.roleRepository.save(roleEntity);
+        RoleEntity savedRole = this.roleRepository.save(roleEntity);
+        log.info("Created role with id {}", savedRole.getId());
     }
 
     @Transactional
@@ -73,6 +77,7 @@ public class RolesService {
         applyRequest(roleEntity, data);
         roleEntity.setUpdatedAt(LocalDateTime.now());
         this.roleRepository.save(roleEntity);
+        log.info("Updated role with id {}", roleEntity.getId());
     }
 
     private void applyRequest(RoleEntity roleEntity, RoleRequest data) {
@@ -82,6 +87,7 @@ public class RolesService {
 
     public void delete(RoleEntity roleEntity){
         this.roleRepository.delete(roleEntity);
+        log.info("Deleted role with id {}", roleEntity.getId());
     }
     
 }

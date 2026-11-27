@@ -15,9 +15,13 @@ import java.util.List;
 @Getter
 @Setter
 public class RoleRequest {
-    @NotBlank
-    @UniqueColumn(column = "name",targetEntity = RoleEntity.class)
+    @NotBlank(message = "Role name is required")
+    @UniqueColumn(column = "name", targetEntity = RoleEntity.class,
+            message = "A role with this name already exists")
     private String name;
-    @NotEmpty
-    private List<@NotNull @Positive Long> permissionIds = new ArrayList<>();
+    @NotEmpty(message = "At least one permission is required")
+    private List<
+            @NotNull(message = "Permission ID cannot be null")
+            @Positive(message = "Permission ID must be a positive number")
+                    Long> permissionIds = new ArrayList<>();
 }

@@ -9,6 +9,7 @@ import com.example.bloodbank.exception.NotFoundIDException;
 import com.example.bloodbank.repository.ClientRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import java.util.List;
 @Service
 @Validated
 @AllArgsConstructor
+@Slf4j
 public class ClientsService {
 
     private final ClientRepository clientRepository;
@@ -29,7 +31,10 @@ public class ClientsService {
 
     public ClientEntity findById(long id) {
         return clientRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Client with id " + id + " not found")
+                () -> {
+                    log.warn("Client with id {} was not found", id);
+                    return new NotFoundIDException("Client with id " + id + " not found");
+                }
         );
     }
 
@@ -63,13 +68,15 @@ public class ClientsService {
         applyRequest(clientEntity, data);
         clientEntity.setPassword(passwordEncoder.encode(data.getPassword()));
         clientEntity.setCreatedAt(LocalDateTime.now());
-        clientRepository.save(clientEntity);
+        ClientEntity savedClient = clientRepository.save(clientEntity);
+        log.info("Created client with id {}", savedClient.getId());
     }
 
     public void update(ClientEntity clientEntity, @Valid ClientRequest data) {
         applyRequest(clientEntity, data);
         clientEntity.setUpdatedAt(LocalDateTime.now());
         clientRepository.save(clientEntity);
+        log.info("Updated client with id {}", clientEntity.getId());
     }
 
     private void applyRequest(ClientEntity clientEntity, ClientRequest data) {
@@ -84,10 +91,12 @@ public class ClientsService {
         clientEntity.setPassword(passwordEncoder.encode(data.getPassword()));
         clientEntity.setUpdatedAt(LocalDateTime.now());
         clientRepository.save(clientEntity);
+        log.info("Updated password for client with id {}", clientEntity.getId());
     }
 
     public void delete(ClientEntity clientEntity) {
         clientRepository.delete(clientEntity);
+        log.info("Deleted client with id {}", clientEntity.getId());
     }
 
 }

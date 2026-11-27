@@ -75,7 +75,7 @@ public class AuthFilter extends OncePerRequestFilter{
         if (path.startsWith("/api/dashboard/") && tokenableType.equals("users")) {
             return true;
         }
-        return path.startsWith("/api/me/") && tokenableType.equals("clients");
+        return (path.startsWith("/api/me/") || path.equals("/api/auth/check")) && tokenableType.equals("clients");
     }
 
     private void setAuthentication(

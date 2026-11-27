@@ -11,15 +11,18 @@ import java.util.List;
 @Getter
 @Setter
 public class UserRequest {
-    @NotEmpty
+    @NotEmpty(message = "Name is required")
     private String name;
-    @NotBlank
-    @Email
-    @UniqueColumn(column = "email",targetEntity = UserEntity.class)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address")
+    @UniqueColumn(column = "email", targetEntity = UserEntity.class,
+            message = "An account with this email already exists")
     private String email;
-    @Size(min = 8)
-    @NotBlank
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
-    @NotEmpty
-    private List<@NotNull @Positive Long> roleIds;
+    @NotEmpty(message = "At least one role is required")
+    private List<
+            @NotNull(message = "Role ID cannot be null")
+            @Positive(message = "Role ID must be a positive number")
+                    Long> roleIds;
 }

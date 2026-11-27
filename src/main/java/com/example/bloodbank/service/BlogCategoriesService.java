@@ -8,6 +8,7 @@ import com.example.bloodbank.exception.NotFoundIDException;
 import com.example.bloodbank.repository.BlogCategoryRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,13 +21,17 @@ import java.util.List;
 @Service
 @Validated
 @AllArgsConstructor
+@Slf4j
 public class BlogCategoriesService {
 
     private final BlogCategoryRepository categoriesRepository;
 
     public BlogCategoryEntity findById(long id){
         return categoriesRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Blog Category with id " + id + " not found")
+                () -> {
+                    log.warn("Blog category with id {} was not found", id);
+                    return new NotFoundIDException("Blog Category with id " + id + " not found");
+                }
         );
     }
 
@@ -59,13 +64,15 @@ public class BlogCategoriesService {
         BlogCategoryEntity categoryEntity = new BlogCategoryEntity();
         applyRequest(categoryEntity,data);
         categoryEntity.setCreatedAt(LocalDateTime.now());
-        this.categoriesRepository.save(categoryEntity);
+        BlogCategoryEntity savedCategory = this.categoriesRepository.save(categoryEntity);
+        log.info("Created blog category with id {}", savedCategory.getId());
     }
 
     public void update(BlogCategoryEntity categoryEntity,@Valid BlogCategoryRequest data){
         applyRequest(categoryEntity, data);
         categoryEntity.setUpdatedAt(LocalDateTime.now());
         this.categoriesRepository.save(categoryEntity);
+        log.info("Updated blog category with id {}", categoryEntity.getId());
     }
 
     private void applyRequest(BlogCategoryEntity categoryEntity, BlogCategoryRequest data) {
@@ -74,9 +81,11 @@ public class BlogCategoriesService {
 
     public boolean delete(BlogCategoryEntity categoryEntity){
         if(!categoryEntity.getBlogs().isEmpty()){
+            log.warn("Cannot delete blog category with id {} because it still has blogs", categoryEntity.getId());
             return false;
         }
         this.categoriesRepository.delete(categoryEntity);
+        log.info("Deleted blog category with id {}", categoryEntity.getId());
         return true;
     }
     

@@ -38,7 +38,7 @@ public class BlogEntity {
         String uri = null;
         if(getImage() != null){
             uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("uploads/blogs/" + image)
+                    .path("src/main/resources/uploads/blogs" + image)
                     .toUriString();
         }
         return uri;

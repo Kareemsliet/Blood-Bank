@@ -8,6 +8,7 @@ import com.example.bloodbank.exception.NotFoundIDException;
 import com.example.bloodbank.repository.DonationRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,13 +21,17 @@ import java.util.List;
 @Service
 @Validated
 @AllArgsConstructor
+@Slf4j
 public class DonationsService {
 
     private final DonationRepository donationRepository;
 
     public DonationEntity findById(long id) {
         return donationRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Donation with id " + id + " not found")
+                () -> {
+                    log.warn("Donation with id {} was not found", id);
+                    return new NotFoundIDException("Donation with id " + id + " not found");
+                }
         );
     }
 
@@ -59,17 +64,20 @@ public class DonationsService {
         DonationEntity donationEntity = new DonationEntity();
         applyRequest(donationEntity, data);
         donationEntity.setCreatedAt(LocalDateTime.now());
-        donationRepository.save(donationEntity);
+        DonationEntity savedDonation = donationRepository.save(donationEntity);
+        log.info("Created donation with id {}", savedDonation.getId());
     }
 
     public void update(DonationEntity donationEntity, @Valid DonationRequest data) {
         applyRequest(donationEntity, data);
         donationEntity.setUpdatedAt(LocalDateTime.now());
         donationRepository.save(donationEntity);
+        log.info("Updated donation with id {}", donationEntity.getId());
     }
 
     public void delete(DonationEntity donationEntity) {
         donationRepository.delete(donationEntity);
+        log.info("Deleted donation with id {}", donationEntity.getId());
     }
 
     private void applyRequest(DonationEntity donationEntity, DonationRequest data) {

@@ -13,13 +13,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BlogRequest {
-    @NotBlank
-    @UniqueColumn(column = "title",targetEntity = BlogEntity.class)
+    @NotBlank(message = "Blog title is required")
+    @UniqueColumn(column = "title", targetEntity = BlogEntity.class,
+            message = "A blog with this title already exists")
     private String title;
-    @NotBlank
-    @Size(max = 250)
+    @NotBlank(message = "Blog content is required")
+    @Size(max = 250, message = "Blog content must be no more than 250 characters")
     private String content;
-    @Positive
-    @ExistsColumn(targetEntity = BlogCategoryEntity.class)
+    @Positive(message = "Category ID must be a positive number")
+    @ExistsColumn(targetEntity = BlogCategoryEntity.class,
+            message = "The selected blog category does not exist")
     private long categoryId;
 }

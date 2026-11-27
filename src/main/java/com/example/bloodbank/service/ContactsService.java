@@ -6,6 +6,7 @@ import com.example.bloodbank.entity.ContactEntity;
 import com.example.bloodbank.exception.NotFoundIDException;
 import com.example.bloodbank.repository.ContactRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,17 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ContactsService {
 
     private final ContactRepository contactsRepository;
 
     public ContactEntity findById(long id){
         return contactsRepository.findById(id).orElseThrow(
-                () -> new NotFoundIDException("Contact with id " + id + " not found")
+                () -> {
+                    log.warn("Contact with id {} was not found", id);
+                    return new NotFoundIDException("Contact with id " + id + " not found");
+                }
         );
     }
 

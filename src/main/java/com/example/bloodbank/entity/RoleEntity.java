@@ -33,7 +33,7 @@ public class RoleEntity {
             joinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id",referencedColumnName = "id")
     )
-    @BatchSize(size = 25)
+    @BatchSize(size = 14)
     private Set<PermissionEntity> permissions = new HashSet<>();
     @ManyToMany(mappedBy = "roles")
     private Set<UserEntity> users = new HashSet<>();

@@ -11,6 +11,7 @@ import com.example.bloodbank.util.JwtToken;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @Service
 @Validated
 @AllArgsConstructor
+@Slf4j
 public class UserAuthenticationService {
 
     private final UserRepository userRepository;
@@ -33,10 +35,12 @@ public class UserAuthenticationService {
     private UserEntity attemptData(String email,String password) throws AuthenticationException {
         Optional<UserEntity> user = userRepository.findByEmail(email);
         if(user.isEmpty()){
+            log.warn("User authentication failed");
             throw new AuthenticationException("email or password does not exist!");
         }
         String encodedPassword = user.get().getPassword();
         if(!passwordEncoder.matches(password,encodedPassword)){
+            log.warn("User authentication failed");
             throw new AuthenticationException("email or password dose not exist!");
         }
         return user.get();
@@ -57,6 +61,7 @@ public class UserAuthenticationService {
         UserEntity user = attemptData(data.getEmail(),data.getPassword());
 
         PersonalAccessTokenEntity personalAccessToken = createNewPersonalAccessToken(user.getId());
+        log.info("User with id {} authenticated successfully", user.getId());
         String token = jwtToken.generateToken(
                 personalAccessToken.getId(),
                 "users",
@@ -74,6 +79,7 @@ public class UserAuthenticationService {
     public void logout(String tokenId){
         personalAccessTokenRepository.deleteById(tokenId);
         SecurityContextHolder.clearContext();
+        log.info("User logged out successfully");
     }
 
 }

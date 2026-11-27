@@ -38,7 +38,6 @@ public class ClientAppController {
             @AuthenticationPrincipal AuthPrincipalDto principalDto,
             @PathVariable long id
     ) {
-        System.out.println(principalDto.getTokenableType());
         DonationDto donation = clientAppService.myDonation(
                 id,
                 principalDto.getTokenableId()

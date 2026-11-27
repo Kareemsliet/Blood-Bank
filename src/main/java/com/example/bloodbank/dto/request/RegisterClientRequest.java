@@ -8,9 +8,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ConfirmedPassword
+@ConfirmedPassword(message = "Password and confirmation do not match")
 public class RegisterClientRequest extends ClientRequest {
-    @NotBlank
-    @Size(min = 8)
+    @NotBlank(message = "Password confirmation is required")
+    @Size(min = 8, message = "Password confirmation must be at least 8 characters long")
     private String confirmedPassword;
 }
